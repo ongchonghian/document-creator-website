@@ -25,7 +25,9 @@ export const PublishedTag: FunctionComponent<PublishedTagProps> = ({ doc }) => {
         </div>
         <a
           className="text-blue font-bold"
-          href={`data:text/json;charset=utf-8,${JSON.stringify(doc.wrappedDocument)}`}
+          href={`data:text/json;charset=utf-8,${encodeURIComponent(
+            JSON.stringify(doc.wrappedDocument)
+          )}`}
           download={doc.fileName}
         >
           Download
