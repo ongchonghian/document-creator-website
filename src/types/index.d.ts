@@ -75,3 +75,8 @@ export interface PublishingJob {
   merkleRoot: string;
   payload: { ownership?: Ownership };
 }
+
+export interface UploadToStorageResponse {
+  success: boolean;
+  errorMsg: string;
+}
