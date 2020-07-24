@@ -55,7 +55,7 @@ describe("usePublishQueue", () => {
   it("should publish correctly", async () => {
     mockGetPublishingJobs.mockReturnValueOnce(sampleJobs);
     mockPublishJob.mockResolvedValue("tx-id");
-    mockUploadToStorage.mockReturnValueOnce(uploadSuccess);
+    mockUploadToStorage.mockReturnValue(uploadSuccess);
     const { result } = renderHook(() => usePublishQueue(config, formEntires));
     await act(async () => {
       await result.current.publish();
@@ -67,7 +67,7 @@ describe("usePublishQueue", () => {
   it("should file failed jobs to failPublishedDocuments", async () => {
     mockGetPublishingJobs.mockReturnValueOnce(sampleJobs);
     mockPublishJob.mockRejectedValueOnce(new Error("Some error"));
-    mockUploadToStorage.mockReturnValueOnce(uploadSuccess);
+    mockUploadToStorage.mockReturnValue(uploadSuccess);
     const { result } = renderHook(() => usePublishQueue(config, formEntires));
     await act(async () => {
       await result.current.publish();
@@ -75,7 +75,7 @@ describe("usePublishQueue", () => {
     expect(result.current.failPublishedDocuments).toHaveLength(2);
   });
 
-  it("should get a list of uploaded document response", async () => {
+  it("should publish correctly if uploaded document is working", async () => {
     mockGetPublishingJobs.mockReturnValueOnce(sampleJobs);
     mockPublishJob.mockResolvedValue("tx-id");
     mockUploadToStorage.mockReturnValue(uploadSuccess);
@@ -85,6 +85,19 @@ describe("usePublishQueue", () => {
       await result.current.publish();
     });
 
-    expect(result.current.uploadToStorageResponse).toHaveLength(3);
+    expect(result.current.publishedDocuments).toHaveLength(3);
+  });
+
+  it("should file failed jobs to failedPublishedDocuments if upload document returns an error", async () => {
+    mockGetPublishingJobs.mockReturnValueOnce(sampleJobs);
+    mockPublishJob.mockResolvedValue("tx-id");
+    mockUploadToStorage.mockRejectedValue(new Error("Upload to Storage error"));
+
+    const { result } = renderHook(() => usePublishQueue(config, formEntires));
+    await act(async () => {
+      await result.current.publish();
+    });
+
+    expect(result.current.failPublishedDocuments).toHaveLength(3);
   });
 });
